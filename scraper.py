@@ -1,6 +1,7 @@
 import re
 from bs4 import BeautifulSoup
 import requests
+import json
 
 def download_wikipedia_site(url):
 
@@ -72,17 +73,34 @@ def get_station_website(wiki_link):
 
 if __name__ == '__main__':
 
+    print "Starting ..."
+
     url = "http://en.wikipedia.org/wiki/List_of_NPR_stations"
 
     html = download_wikipedia_site(url)
     rows = get_rows(html)
     for i in range(0, len(rows)):
-        rows[i]['station_url'] = get_station_website(rows[i]['wiki_link'])
+        rows[i]['website'] = get_station_website(rows[i]['wiki_link'])
         #print rows[i]
         #raise Exception('debug')
 
         print "{0}/{1}".format(i, len(rows))
 
-    print rows
-        
+    with open('stations.json', 'w') as f:
+        f.write(json.dumps(rows))
+
+    with open('stations.csv', 'w') as f:
+        f.write('state, town, wiki_link, station, freq, website, ,\n')
+        for row in rows:
+            f.write('{0}, {1}, {2}, {3}, {4}, {5}, ,\n'.format(
+                row['state'],
+                row['town'],
+                row['wiki_link'],
+                row['station'],
+                row['freq'],
+                '{0}'.format(row['website']))
+            )
+        r.write('\n')
+
+    print "Done."
 
